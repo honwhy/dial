@@ -3,29 +3,34 @@ use std::time::Duration;
 use crossbeam::sync::WaitGroup;
 use std::thread;
 use std::sync::{Arc, Mutex};
+use structopt::StructOpt;
 
-//#[macro_use]
-//extern crate clap;
-/*
-#[derive(clap)]
-#[clap(version = "0.1", author="honwhy wang")]
-struct opts {
-    #[clap(]
-    host_name: string,
+
+#[derive(Debug, StructOpt)]
+#[structopt(name = "dail example", about = "An example of server ports scanning.")]
+struct Opt {
+    #[structopt(long = "hostname", default_value = "", help = "hostname to test")]
+    host_name: String,
+    #[structopt(long = "start-port", default_value = "80", help = "the port on which the scanning starts" )]
     start_port: u16,
+    #[structopt(long = "end-port", default_value = "100", help = "the port from which the scanning ends" )]
     end_port: u16,
-}*/
+    #[structopt(long = "timeout", default_value = "200", help = "timeout" )]
+    timeout: u32,
+
+}
 fn main() {
+    let opt = Opt::from_args();
     let vec: Vec<u16> = Vec::new();
     let arc_vec = Arc::new(Mutex::new(vec));
     
     // create a new wait group.
     let wg = WaitGroup::new();
-    for n in 80..89 {
+    for n in opt.start_port..opt.end_port{
         // create another reference to the wait group.
         let wg = wg.clone();
         let arc_vec = arc_vec.clone();
-        let domain = String::from("google.com");
+        let domain = String::from(&opt.host_name);
         thread::spawn(move || {
             let flag = is_open(&domain, n);
             if flag {

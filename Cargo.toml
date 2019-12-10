@@ -8,4 +8,4 @@ edition = "2018"
 
 [dependencies]
 crossbeam = "0.7.3"
-clap = "2.33.0"
+structopt = "0.3"
