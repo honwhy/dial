@@ -1,7 +1,9 @@
+#[macro_use]
+extern crate may;
+
 use std::net::{TcpStream, ToSocketAddrs, Shutdown};
 use std::time::Duration;
 use crossbeam::sync::WaitGroup;
-use std::thread;
 use std::sync::{Arc, Mutex};
 use structopt::StructOpt;
 
@@ -31,7 +33,7 @@ fn main() {
         let wg = wg.clone();
         let arc_vec = arc_vec.clone();
         let domain = String::from(&opt.host_name);
-        thread::spawn(move || {
+        go!(move || {
             let flag = is_open(&domain, n);
             if flag {
                 arc_vec.lock().unwrap().push(n);
@@ -41,7 +43,7 @@ fn main() {
             drop(wg);
         });
     }
-    // Block until all threads have finished their work.
+    // Block until all coroutines have finished their work.
     wg.wait();
     println!("opened ports: {:?}", arc_vec.lock().unwrap());
 }
